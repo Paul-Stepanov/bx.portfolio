@@ -1,5 +1,6 @@
 .idea/
 /bitrix/
 /upload/
+/local/vendor/
 .htaccess
 robots.txt
