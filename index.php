@@ -216,12 +216,12 @@
    <!-- Work ↑ -->
 	<?php $APPLICATION->IncludeComponent(
 	"stepanov:reviews.list", 
-	".default", 
+	"portfolio", 
 	array(
 		"REVIEWS_COUNT" => "4",
 		"SORT_BY" => "PROPERTY_RATING",
 		"SORT_ORDER" => "ASC",
-		"COMPONENT_TEMPLATE" => ".default"
+		"COMPONENT_TEMPLATE" => "portfolio"
 	),
 	false
 ); ?>
