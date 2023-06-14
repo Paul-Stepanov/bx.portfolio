@@ -195,9 +195,8 @@
  </section>
 <!-- Work ↑ --> <?$APPLICATION->IncludeComponent(
 	"stepanov:reviews.list",
-	"portfolio",
+	"",
 	Array(
-		"COMPONENT_TEMPLATE" => "portfolio",
 		"REVIEWS_COUNT" => "4",
 		"SORT_BY" => "PROPERTY_RATING",
 		"SORT_ORDER" => "ASC"

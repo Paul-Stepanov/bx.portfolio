@@ -24,13 +24,6 @@
     class ReviewsList extends CBitrixComponent
     {
         /**
-         * Постраничная навигация.
-         *
-         * @var string|false
-         */
-        private string|false $navString;
-
-        /**
          * Данные информационного блока "отзывы".
          *
          * @var array|bool
