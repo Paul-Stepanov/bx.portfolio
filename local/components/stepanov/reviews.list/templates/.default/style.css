@@ -3,8 +3,9 @@
     display: flex;
     justify-content: center;
     margin: 0 auto;
-    background-color: whitesmoke;
+    background-color: #161b25;
     padding: 20px;
+    color: #f5efef;
 }
 
 .component__container {
@@ -13,10 +14,13 @@
     max-width: 90%;
 }
 
+/*------------------------------------------------------------------------------------------#
+    Стили списка отзывов ↓
+#------------------------------------------------------------------------------------------*/
 .component__body {
     border: 1px solid grey;
     border-radius: 5px;
-    background-color: white;
+    background-color: #161b25;
     padding: 10px;
     margin-bottom: 10px;
     display: grid;
@@ -29,7 +33,15 @@
 
 .component__username {
     grid-area: username;
-    color: inherit;
+    color: orange;
+    background-color: #2e323b;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    padding: 0.3vw;
+    text-align: center;
+
 }
 
 .component__rating {
@@ -38,27 +50,27 @@
     position: relative;
     display: flex;
     align-items: center;
+    justify-content: center;
     line-height: 1;
-}
-
-.component__rating-count {
-    display: none;
+    padding: 0.5vw;
+    background-color: #f5efef;
+    border-radius: 5px;
 }
 
 .component__rating-star {
-    background-image: url("../img/star.png");
+    background-image: url("img/star.png");
     background-size: contain;
     background-repeat: no-repeat;
-    width: 20px;
-    height: 20px;
+    width: 2vw;
+    height: 2vw;
 }
 
 .component__rating-star--active {
-    background-image: url("../img/goldstar.png");
+    background-image: url("img/goldstar.png");
     background-size: contain;
     background-repeat: no-repeat;
-    width: 20px;
-    height: 20px;
+    width: 2vw;
+    height: 2vw;
 }
 
 .component__comment {
@@ -69,15 +81,20 @@
     color: inherit;
 }
 
+/*------------------------------------------------------------------------------------------#
+    Стили формы добавления отзыва ↓
+#------------------------------------------------------------------------------------------*/
 .component__form-wrapper {
     border: 1px solid #4e555b;
     border-radius: 5px;
-    padding: 15px;
+    padding: 20px;
 }
 
 .component__form-body {
     width: 100%;
     display: grid;
+    justify-content: center;
+    align-items: stretch;
     grid-template-columns: 30% 70%;
     grid-template-areas:
             "name text"
@@ -92,14 +109,15 @@
 }
 
 .component__input-name {
+    font-size: 1.5vw;
     display: block;
     width: 100%;
     background-color: transparent;
     border: 1px solid #c4c4c4;
     border-radius: 5px;
-    padding: 10px;
+    padding: 1vw;
     color: inherit;
-    margin: 5px 0;
+    margin-top: 0.5vw;
     transition: all 0.2s ease-in-out;
 }
 
@@ -116,54 +134,61 @@
     position: relative;
     display: flex;
     flex-direction: row-reverse;
-    justify-content: flex-end;
+    justify-content: center;
+    background-color: #f5efef;
+    border-radius: 5px;
 }
 
 .component__label-rating {
     display: inline-block;
     cursor: pointer;
-    background-image: url("../img/star.png");
+    background-image: url("img/star.png");
+    background-repeat: no-repeat;
     background-size: contain;
-    width: 20px;
-    height: 20px;
+    padding: 1.3vw;
+    width: 2vw;
+    height: 2vw;
     z-index: 10;
     transition: all 0.2s linear;
 }
 
 .component__input-rating:checked,
 .component__input-rating:checked ~ .component__label-rating {
-    background-image: url("../img/goldstar.png");
+    background-image: url("img/goldstar.png");
 }
 
 .component__label-rating:hover,
 .component__label-rating:hover ~ .component__label-rating,
 .component__label-rating:checked ~ .component__label-rating:hover {
-    background-image: url("../img/goldstar.png");
+    background-image: url("img/goldstar.png");
 }
 
 .component__input-rating {
     opacity: 0.3;
     position: absolute;
-    width: 0%;
-    height: 0%;
+    width: 0;
+    height: 0;
     top: 0;
     left: 0;
 }
 
 .component__label-comment {
     grid-area: text;
-    display: block;
+    display: flex;
+    flex-direction: column;
+
 }
 
 .component__text-comment {
-    width: 90%;
-    height: 90%;
+    font-size: 1.5vw;
+    width: 100%;
+    height: 100%;
     background-color: transparent;
     border: 1px solid #c4c4c4;
     border-radius: 5px;
-    padding: 10px;
+    padding: 1vw;
     color: inherit;
-    margin: 5px 0;
+    margin-top: 0.5vw;
     transition: all 0.2s ease-in-out;
 }
 
@@ -181,9 +206,10 @@
     background-color: transparent;
     border: 1px solid #c4c4c4;
     border-radius: 5px;
-    padding: 10px;
+    padding: 1vw;
     transition: all 0.3s ease-in-out;
-    color: black;
+    color: inherit;
+    font-size: inherit;
 }
 
 .component__submit-button::before {
@@ -193,13 +219,19 @@
     height: 100%;
     top: 0;
     left: 0;
-    background-color: rgba(10, 10, 10, 0.1);
-    transition: all 0.3s ease-in-out;
+    opacity: 0;
+    background-color: rgba(255, 165, 0);
+    transition: width 0.35s ease-in-out, opacity 0.4s linear;
 }
 
 .component__submit-button:hover:before {
+    content: 'Жми!!!';
+    opacity: 1;
+    color: inherit;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 100%;
-    color: black;
 
 }
 
@@ -207,13 +239,19 @@
     box-shadow: 0 3px 3px 1px #c4c4c4;
 }
 
+/*------------------------------------------------------------------------------------------#
+    Стили постраничной навигации ↓
+#------------------------------------------------------------------------------------------*/
 .component__nav-string {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.error-center {
+/*------------------------------------------------------------------------------------------#
+    Стили вывода ошибки при отсутствии инфоблока Отзывы ↓
+#------------------------------------------------------------------------------------------*/
+.errortext {
     text-align: center;
     font-size: 1.5vw;
     max-width: 100%;
