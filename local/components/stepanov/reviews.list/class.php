@@ -4,14 +4,10 @@
         die();
     }
 
-    use Bitrix\Main\{Application,
-        HttpRequest,
-        Loader,
-        LoaderException,
-        SystemException
-    };
+    use Bitrix\Main\{Loader, LoaderException, SystemException};
+    use Bitrix\Main\Engine\Contract\Controllerable;
 
-    /**------------------------------------------------------------------------------------------#
+    /**------------------------------------------------------------------------#
      * Для использования компонента необходимо создать информационный блок
      * "Отзывы", с символьным кодом: "reviews", содержащий свойства:
      * - "Комментарий" (тип - строка, код свойства - "COMMENT", обязательное к
@@ -20,9 +16,17 @@
      * до 5). Для хранения имени комментатора используется поле инфоблока
      * "Анонс" ("PREVIEW_TEXT"), текста комментария - свойство "Комментарий"
      * ("COMMENT"), оценки - свойство "Оценка" ("RATING").
-     * #------------------------------------------------------------------------------------------*/
+     * #----------------------------------------------------------------------*/
     class ReviewsList extends CBitrixComponent
+        implements Controllerable
     {
+        /**
+         * Счетчик компонентов.
+         *
+         * @var int
+         */
+        private static int $countReviewsComponent = 0;
+
         /**
          * Данные информационного блока "отзывы".
          *
@@ -68,9 +72,9 @@
         ];
 
         /**
-         *------------------------------------------------------------------------------------------#
+         *---------------------------------------------------------------------#
          * Подготовка параметров компонента ↓
-         * ---------------------------------------------------------------------------------------#
+         * ------------------------------------------------------------------#
          *
          * @param $arParams
          *
@@ -79,6 +83,10 @@
          */
         public function onPrepareComponentParams($arParams): array
         {
+            $this->checkIBlockModule();
+
+            $this->getIBlockReviews();
+
             $arParams["REVIEWS_COUNT"] = intval($arParams["REVIEWS_COUNT"]);
 
             if ($arParams["REVIEWS_COUNT"] <= 0) {
@@ -89,41 +97,10 @@
         }
 
         /**
-         *------------------------------------------------------------------------------------------#
-         * Формирование массива arResult и передача его в шаблон компонента ↓
-         * ---------------------------------------------------------------------------------------#
-         *
-         * @return void
-         *
-         */
-        public function executeComponent(): void
-        {
-            $this->checkIBlockModule();
-
-            $this->getIBlockReviews();
-
-            $this->checkIBlockReviews($this->iBlockReviews);
-
-            $iBlockReviewsResultObject = $this->getIBlockReviewsResultObject();
-
-            $this->getIBlockReviewsElements($iBlockReviewsResultObject);
-
-            $this->getNavString($iBlockReviewsResultObject);
-
-            $this->getRatingEnumFields();
-
-            $this->addComment($this->getCommentRequestObject());
-
-            $this->arResult["IBLOCK"] = $this->iBlockReviews;
-
-            $this->includeComponentTemplate();
-        }
-
-        /**
-         *------------------------------------------------------------------------------------------#
+         *---------------------------------------------------------------------#
          * Проверка наличие в системе установленного модуля "Информационные
          * блоки" ↓
-         *----------------------------------------------------------------------------------------#
+         *-------------------------------------------------------------------#
          */
         private function checkIBlockModule(): void
         {
@@ -132,7 +109,7 @@
                     ? true
                     : throw new LoaderException(
                     ShowError(
-                        strError: "Не установлен модуль 'Информационные блоки (iblock)'!!!",
+                        "Не установлен модуль 'Информационные блоки (iblock)'!!!",
                     )
                 );
             } catch (LoaderException $exception) {
@@ -141,9 +118,9 @@
         }
 
         /**
-         *------------------------------------------------------------------------------------------#
+         *---------------------------------------------------------------------#
          * Запрос данных информационного блока "Отзывы" ↓
-         *----------------------------------------------------------------------------------------#
+         *-------------------------------------------------------------------#
          *
          * @return void
          */
@@ -157,10 +134,37 @@
         }
 
         /**
-         * ------------------------------------------------------------------------------------------#
+         *---------------------------------------------------------------------#
+         * Формирование массива arResult и передача его в шаблон компонента ↓
+         * ------------------------------------------------------------------#
+         *
+         * @return void
+         *
+         */
+        public function executeComponent(): void
+        {
+            $this->checkIBlockReviews($this->iBlockReviews);
+
+            $iBlockReviewsResultObject = $this->getIBlockReviewsResultObject();
+
+            $this->getIBlockReviewsElements($iBlockReviewsResultObject);
+
+            $this->getNavString($iBlockReviewsResultObject);
+
+            $this->getRatingEnumFields();
+
+            $this->arResult["IBLOCK"] = $this->iBlockReviews;
+
+            $this->arResult["COUNT"] = self::$countReviewsComponent++;
+
+            $this->includeComponentTemplate();
+        }
+
+        /**
+         * --------------------------------------------------------------------#
          * Проверка существования инфоблока "Отзывы", с символьным кодом
          * "reviews" ↓
-         * ----------------------------------------------------------------------------------------#
+         * ------------------------------------------------------------------#
          *
          * @param $iBlockReviews
          *
@@ -172,7 +176,7 @@
                     ? true
                     : throw new SystemException(
                     ShowError(
-                        strError: "Отсутствует информационный блок 'Отзывы'!
+                        "Отсутствует информационный блок 'Отзывы'!
                                 Для использования компонента необходимо создать информационный блок 'Отзывы',
                                 с символьным кодом: 'reviews', содержащий свойства:
                                 - 'Комментарий' (тип - строка, код свойства - 'COMMENT', обязательное к заполнению);
@@ -185,9 +189,9 @@
         }
 
         /**
-         *------------------------------------------------------------------------------------------#
-         * Получаем экземпляр класса CIBlockResult ↓
-         * ---------------------------------------------------------------------------------------#
+         *---------------------------------------------------------------------#
+         * Создание экземпляра класса CIBlockResult ↓
+         * ------------------------------------------------------------------#
          *
          * @return \CIBlockResult|int
          */
@@ -212,9 +216,9 @@
         }
 
         /**
-         *------------------------------------------------------------------------------------------#
+         *---------------------------------------------------------------------#
          * Выбираем элементы инфоблока "Отзывы" с необходимыми полями ↓
-         *---------------------------------------------------------------------------------------#
+         *------------------------------------------------------------------#
          *
          * @param  CIBlockResult  $iBlockResult
          *
@@ -230,9 +234,9 @@
         }
 
         /**
-         *------------------------------------------------------------------------------------------#
+         *---------------------------------------------------------------------#
          * Формирование постраничной навигации ↓
-         *---------------------------------------------------------------------------------------#
+         *------------------------------------------------------------------#
          *
          * @param  CIBlockResult  $iBlockResult
          *
@@ -249,9 +253,9 @@
         }
 
         /**
-         *------------------------------------------------------------------------------------------#
+         *---------------------------------------------------------------------#
          * Формирование списка полей элементов рейтинга ↓
-         *---------------------------------------------------------------------------------------#
+         *------------------------------------------------------------------#
          *
          * @return void
          */
@@ -269,76 +273,181 @@
         }
 
         /**
-         *------------------------------------------------------------------------------------------#
-         * Добавляем комментарий в инфоблок "Отзывы" ↓
-         * ---------------------------------------------------------------------------------------#
+         *---------------------------------------------------------------------#
+         * Пред проверка параметров для AJAX  ↓
+         *-------------------------------------------------------------------#
          *
-         * @param  HttpRequest  $request
+         * @return array[]
+         */
+        public function configureActions(): array
+        {
+            return [
+                'ajaxAddComment' => [
+                    'prefilters' => [],
+                ],
+            ];
+        }
+
+        /**
+         *---------------------------------------------------------------------#
+         * Добавление комментария с помощью AJAX ↓
+         * ------------------------------------------------------------------#
+         *
+         * @param $formData
+         *
+         * @throws \Bitrix\Main\SystemException
+         */
+        public function ajaxAddCommentAction($formData)
+        {
+            $comment = $this->preparationCommentData($formData);
+
+            $this->checkCompletionCommentData($comment);
+
+            $this->preparationCommentBody($comment);
+
+            $this->addComment();
+        }
+
+        /**
+         * --------------------------------------------------------------------#
+         * Подготовка данных из формы, полученных посредством AJAX ↓
+         * ------------------------------------------------------------------#
+         *
+         * @param $commentData
+         *
+         * @return mixed
+         */
+        private function preparationCommentData($commentData): mixed
+        {
+            $commentBody = json_decode($commentData, true);
+
+            $commentBody = $this->clearingCommentData($commentBody);
+
+            if ($commentBody["rating"] == 'default') {
+                $commentBody["rating"] = 0;
+            }
+
+            return $commentBody;
+        }
+
+        /**
+         *---------------------------------------------------------------------#
+         * Очистка данных полученных из формы ↓
+         * ------------------------------------------------------------------#
+         *
+         * @param $commentData
+         *
+         * @return mixed
+         */
+        private function clearingCommentData($commentData): mixed
+        {
+            foreach ($commentData as $key => $value) {
+                $commentData[$key] = htmlspecialchars(
+                    stripslashes(
+                        trim(
+                            $value,
+                        ),
+                    ),
+                );
+            }
+
+            return $commentData;
+        }
+
+        /**
+         * --------------------------------------------------------------------#
+         * Проверка данных формы на заполнение ↓
+         * -----------------------------------------------------------------#
+         *
+         * @param $commentData
          *
          * @return void
+         * @throws \Bitrix\Main\SystemException
          */
-        private function addComment(
-            HttpRequest $request,
+        private function checkCompletionCommentData(
+            $commentData,
         ): void {
-            $values = $request->getPostList()->toArray();
-
-            if (!empty($values)) {
-                if (!empty($values["name"] && !empty($values["comment"]))) {
-                    $values["name"] = $this->checkFormData($values['name']);
-                    $values["comment"] =
-                        $this->checkFormData($values['comment']);
-                    $this->commentFieldsIBlockReviews["IBLOCK_ID"] =
-                        $this->iBlockReviews["ID"];
-                    $this->commentFieldsIBlockReviews["PREVIEW_TEXT"] =
-                        $values["name"];
-                    $values["name"] = sprintf("%s_%s", $values["name"], rand());
-                    $this->commentFieldsIBlockReviews["NAME"] = $values["name"];
-                    $code = CUtil::translit(
-                        $values['name'],
-                        "ru",
-                        $this->translitCodeParams,
-                    );
-                    $this->commentFieldsIBlockReviews["CODE"] = $code;
-                    $this->commentFieldsIBlockReviews["PROPERTY_VALUES"]["RATING"] =
-                        $values["rating"];
-                    $this->commentFieldsIBlockReviews["PROPERTY_VALUES"]["COMMENT"] =
-                        $values["comment"];
-                    $oElement = new CIBlockElement();
-                    $oElement->Add($this->commentFieldsIBlockReviews);
-                    echo "<meta http-equiv='refresh' content='0'>";
-                } else {
-                    ShowError(
-                        strError: "Поля: 'Имя' и 'Комментарий', обязательны для заполнения!",
-                    );
-                }
+            if ((empty($commentData['name']))
+                || (empty($commentData['comment']))
+            ) {
+                throw new SystemException(
+                    "Поле 'имя' и 'комментарий' обязательны к заполнению!"
+                );
             }
         }
 
         /**
-         * ------------------------------------------------------------------------------------------#
-         * Проверка данных формы ↓
-         * ---------------------------------------------------------------------------------------#
+         * --------------------------------------------------------------------#
+         * Подготовка полей для добавления нового комментария  ↓
+         * ------------------------------------------------------------------#
+         *
+         * @param $commentData
+         *
+         * @return void
+         */
+        private function preparationCommentBody($commentData): void
+        {
+            $this->commentFieldsIBlockReviews["IBLOCK_ID"] =
+                $this->iBlockReviews["ID"];
+
+            $this->commentFieldsIBlockReviews["PREVIEW_TEXT"] =
+                $commentData["name"];
+
+            $this->commentFieldsIBlockReviews["NAME"] =
+                sprintf("%s_%s", $commentData["name"], rand());
+
+            $this->commentFieldsIBlockReviews["CODE"] = $this->translitData(
+                $this->commentFieldsIBlockReviews["NAME"],
+            );
+
+            $this->commentFieldsIBlockReviews["PROPERTY_VALUES"]["RATING"] =
+                $commentData["rating"];
+
+            $this->commentFieldsIBlockReviews["PROPERTY_VALUES"]["COMMENT"] =
+                $commentData["comment"];
+        }
+
+        /**
+         * --------------------------------------------------------------------#
+         * Метод для транслитации строки ↓
+         * ------------------------------------------------------------------#
          *
          * @param $data
          *
          * @return string
          */
-        private function checkFormData(
-            $data,
-        ): string {
-            return htmlspecialchars(stripslashes(trim($data)));
+        private function translitData($data): string
+        {
+            return CUtil::translit(
+                $data,
+                "ru",
+                $this->translitCodeParams,
+            );
         }
 
         /**
-         *------------------------------------------------------------------------------------------#
-         * Получаем экземпляр класса \Bitrix\Main\HttpRequest ↓
-         *---------------------------------------------------------------------------------------#
+         * --------------------------------------------------------------------#
+         * Добавление комментария в информационный блок ↓
+         * -----------------------------------------------------------------#
          *
-         * @return \Bitrix\Main\HttpRequest
+         * @return void
          */
-        public function getCommentRequestObject(): HttpRequest
+        private function addComment(): void
         {
-            return Application::getInstance()->getContext()
-                ->getRequest();
+            try {
+                $oElement = new CIBlockElement();
+
+                $commentId = $oElement->Add($this->commentFieldsIBlockReviews);
+
+                if ($commentId) {
+                    return;
+                } else {
+                    throw new SystemException(
+                        "Ошибка при добавлении комментария!"
+                    );
+                }
+            } catch (SystemException $exception) {
+                $exception->getMessage();
+            }
         }
     }
